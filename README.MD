@@ -4,11 +4,11 @@
 
 ## Features
 
-	-	YAML config (s4_config.yaml) with **value** / **choices** / **linspace** / **logspace** specs.
-	-	Sweeps wavelength, angles, period a, layer thicknesses, and shape parameters.
-	-	Geometry assembled from rectangles and ellipses; domain = superstrate / single metasurface layer / substrate.
-	-	Material dispersion from the refractiveindex.info database (via the refractiveindex Python package).
-	-	MPI parallelism (via mpi4py) that splits work by wavelength; geometry variants run sequentially.
+	- YAML config (s4_config.yaml) with **value** / **choices** / **linspace** / **logspace** specs.
+	- Sweeps wavelength, angles, period a, layer thicknesses, and shape parameters.
+	- Geometry assembled from rectangles and ellipses; domain = superstrate / single metasurface layer / substrate.
+	- Material dispersion from the refractiveindex.info database (via the refractiveindex Python package).
+	- MPI parallelism (via mpi4py) that splits work by wavelength; geometry variants run sequentially.
 
 ## How it works (MPI)
 
@@ -49,6 +49,7 @@ Outputs: one NPZ per geometry variant
 	-	materials — dict with material specs used to build ε(λ).
 
 ## Requirements (tested pins)
+
 	-	Python 3.11
 	-	NumPy 1.26 (pinned; S4 wheels from phoeby expect this)
 	-	S4 (clone from https://github.com/phoebe-p/S4)
@@ -61,6 +62,7 @@ If you install it in the same env, do not upgrade NumPy:
 	-	pip install --no-deps scikit-image lazy_loader, or
 
 ## Acknowledgements
+
 	-	S4 (Stanford Stratified Structure Solver) by Victor Liu & Shanhui Fan.
 Binary builds used here come from the phoebe-p channel.
 	-	refractiveindex.info database curated by Mikhail Polyanskiy (and contributors).
