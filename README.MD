@@ -13,15 +13,13 @@
 ## How it works (MPI)
 
 S4’s Python bindings aren’t MPI-aware, so the code parallelizes the outer simulation loops:
-
 - Rank 0 prints status and writes results.
 - All ranks build the same geometry variant, then each rank processes a round-robin subset of wavelengths.
 - Results are reduced (Allreduce) and saved as <filename>_<variant>.npz.
 
 ## Config
 
-All simulation inputs live in s4_config.yaml. Key parts:
-
+All simulation inputs live in `s4_config.yaml`. Key parts:
 - lattice.a and each layer thickness accept value/choices/lin/log.
 - sweep.wl, sweep.theta, sweep.phi control spectral/angle sweeps.
 - materials: map material keys (e.g., Air, Meta, Sub) to refractiveindex.info datasets (or constants like source: n=1.0).
@@ -34,9 +32,8 @@ All simulation inputs live in s4_config.yaml. Key parts:
 
     NP=16 ./run.sh 
     
-Outputs: one NPZ per geometry variant
+3) Outputs: one NPZ per geometry variant
 <filename>_<vidx>.npz containing:
-
 - variant — Python dict of the exact geometry used (unwrap with .item()).
 - T, R — float64 arrays, shape (2, num_orders, N_theta, N_wl): per-order intensity (fraction of incident power). First axis: 0 = s, 1 = p.
 - T_phase, R_phase — float64 arrays (radians), same shape as above: per-order phase in [-π, π].
@@ -55,9 +52,8 @@ Outputs: one NPZ per geometry variant
 - refractiveindex (Python package by toftul) for refractiveindex.info parsing
 - scikit-image 0.25.2 for quick geometry raster previews
 
-If you install it in the same env, do not upgrade NumPy:
-
-- pip install --no-deps scikit-image lazy_loader, or
+If you install it in the same env, do not upgrade NumPy
+- pip install --no-deps scikit-image lazy_loader
 
 ## Acknowledgements
 
