@@ -3,7 +3,6 @@
 **MetaSolverS4** is a small, easy-to-run driver around the **S4** RCWA solver that uses a flexible YAML config and MPI to sweep wavelengths, incidence angles, and geometry variants. It computes **transmission** and **reflection** intensity and phase per diffraction order for s and p polarizations.
 
 ## Features
-    <!-- toc -->
 
 	•	YAML config (s4_config.yaml) with **value** / **choices** / **linspace** / **logspace** specs.
 	•	Sweeps wavelength, angles, period a, layer thicknesses, and shape parameters.
@@ -11,23 +10,18 @@
 	•	Material dispersion from the refractiveindex.info database (via the refractiveindex Python package).
 	•	MPI parallelism (via mpi4py) that splits work by wavelength; geometry variants run sequentially.
 
-    <!-- tocstop -->
-
 ## How it works (MPI)
 
 S4’s Python bindings aren’t MPI-aware, so the code parallelizes the outer simulation loops:
-
-    <!-- toc -->
 
 	•	Rank 0 prints status and writes results.
 	•	All ranks build the same geometry variant, then each rank processes a round-robin subset of wavelengths.
 	•	Results are reduced (Allreduce) and saved as <filename>_<variant>.npz.
 
-    <!-- tocstop -->
-
 ## Config
 
 All simulation inputs live in s4_config.yaml. Key parts:
+
 	•	lattice.a and each layer thickness accept value/choices/lin/log.
 	•	sweep.wl, sweep.theta, sweep.phi control spectral/angle sweeps.
 	•	materials: map material keys (e.g., Air, Meta, Sub) to refractiveindex.info datasets (or constants like source: n=1.0).
@@ -44,6 +38,7 @@ All simulation inputs live in s4_config.yaml. Key parts:
     
 Outputs: one NPZ per geometry variant
 <filename>_<vidx>.npz containing:
+
 	•	variant — Python dict of the exact geometry used (unwrap with .item()).
 	•	T, R — float64 arrays, shape (2, num_orders, N_theta, N_wl): per-order intensity (fraction of incident power). First axis: 0 = s, 1 = p.
 	•	T_phase, R_phase — float64 arrays (radians), same shape as above: per-order phase in [-π, π].
