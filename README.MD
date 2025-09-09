@@ -1,22 +1,31 @@
-**MetaSolverS4**
+# MetaSolverS4
 
 **MetaSolverS4** is a small, easy-to-run driver around the **S4** RCWA solver that uses a flexible YAML config and MPI to sweep wavelengths, incidence angles, and geometry variants. It computes **transmission** and **reflection** intensity and phase per diffraction order for s and p polarizations.
 
-**Features**
+## Features
+    <!-- toc -->
+
 	•	YAML config (s4_config.yaml) with **value** / **choices** / **linspace** / **logspace** specs.
 	•	Sweeps wavelength, angles, period a, layer thicknesses, and shape parameters.
 	•	Geometry assembled from rectangles and ellipses; domain = superstrate / single metasurface layer / substrate.
 	•	Material dispersion from the refractiveindex.info database (via the refractiveindex Python package).
 	•	MPI parallelism (via mpi4py) that splits work by wavelength; geometry variants run sequentially.
 
-**How it works (MPI)**
+    <!-- tocstop -->
+
+## How it works (MPI)
 
 S4’s Python bindings aren’t MPI-aware, so the code parallelizes the outer simulation loops:
+
+    <!-- toc -->
+
 	•	Rank 0 prints status and writes results.
 	•	All ranks build the same geometry variant, then each rank processes a round-robin subset of wavelengths.
 	•	Results are reduced (Allreduce) and saved as <filename>_<variant>.npz.
 
-**Config**
+    <!-- tocstop -->
+
+## Config
 
 All simulation inputs live in s4_config.yaml. Key parts:
 	•	lattice.a and each layer thickness accept value/choices/lin/log.
@@ -25,7 +34,7 @@ All simulation inputs live in s4_config.yaml. Key parts:
 	•	shapes: list of rectangles/ellipses with center, size, rotation; fields support sweeps and simple ties.
     •	S4 parameters and options: to control simulation properties
 
-**Usage**
+## Usage
 
     # 1) Edit s4_config.yaml to your liking.
 
@@ -44,7 +53,7 @@ Outputs: one NPZ per geometry variant
 	•	orders — list of (m, n) diffraction orders (same ordering as S4’s GetBasisSet()).
 	•	materials — dict with material specs used to build ε(λ).
 
-**Requirements (tested pins)**
+## Requirements (tested pins)
 	•	Python 3.11
 	•	NumPy 1.26 (pinned; S4 wheels from phoeby expect this)
 	•	S4 (clone from https://github.com/phoebe-p/S4)
@@ -54,7 +63,7 @@ Outputs: one NPZ per geometry variant
 If you install it in the same env, do not upgrade NumPy:
 	•	pip install --no-deps scikit-image lazy_loader, or
 
-**Acknowledgements**
+## Acknowledgements
 	•	S4 (Stanford Stratified Structure Solver) by Victor Liu & Shanhui Fan.
 Binary builds used here come from the phoebe-p channel.
 	•	refractiveindex.info database curated by Mikhail Polyanskiy (and contributors).
