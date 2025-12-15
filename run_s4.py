@@ -65,7 +65,6 @@ def run_s4(cfg, *, timer: bool = False):
                                         sAmplitude=(1 - pidx)+0j, 
                                         pAmplitude=pidx+0j, 
                                         Order=0) 
-                
                 for idx in my_idx: # Iterates over wavelengths with MPI
                     lam = wl[idx]
                     S.SetFrequency(1.0/lam)
@@ -105,12 +104,12 @@ def run_s4(cfg, *, timer: bool = False):
 
                         R_phase[pidx, j, a_idx, idx] = np.angle(r_amp)  # [-pi, pi]
                         T_phase[pidx, j, a_idx, idx] = np.angle(t_amp)
-                        
+        
         T_global = np.empty_like(T)
         R_global = np.empty_like(R)
         T_phase_global = np.zeros_like(T_phase)
         R_phase_global = np.zeros_like(R_phase)
-        
+
         comm.Allreduce(T, T_global, op=MPI.SUM)
         comm.Allreduce(R, R_global, op=MPI.SUM)
         comm.Allreduce(T_phase, T_phase_global, op=MPI.SUM)
@@ -122,6 +121,7 @@ def run_s4(cfg, *, timer: bool = False):
 
         # ---- save from a single writer
         if rank == 0:
+            print(f"Saving results for variant {vidx} to {cfg['filename']}_{vidx}.npz")
             np.savez(f"{cfg['filename']}_{vidx}.npz", 
                      variant=variant, 
                      T=T_global, 

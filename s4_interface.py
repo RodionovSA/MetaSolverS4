@@ -1,6 +1,7 @@
 import numpy as np
 import S4
 from refractiveindex import RefractiveIndexMaterial
+import refractiveindex as ri
 
 from skimage.draw import polygon, ellipse
 
@@ -30,9 +31,22 @@ def make_eps_fns(materials):
     fns = {}
     for key, m in materials.items():
         src = str(m.get("source", "")).strip()
+        shelf = str(m.get("shelf", "")).strip()
         if src.startswith("n="):                      # constant index
             n0 = float(src.split("=", 1)[1])
             fns[key] = lambda lam, n0=n0: (n0 + 0j)**2
+        elif shelf == 'RIDB': # from RIDB
+            try:
+                import ridb
+            except ImportError:
+                raise ImportError("Please install the 'ridb' package to use RIDB materials.")
+            
+            RIDB = ridb.RIDB()
+            if src not in RIDB.materials:
+                raise ValueError(f"Material '{src}' not found in RIDB database.")
+            mat_ridb = RIDB.get_material(src)
+
+            fns[key] = lambda w_um, _mat=mat_ridb: _mat.epsilon(np.linspace(1, 1, 1)*float(w_um)*1000)[0]
         else:                                         # from refractiveindex.info
             # Dataset from the DB
             mat_ri = RefractiveIndexMaterial(shelf=m.get("shelf", ""), 
@@ -41,7 +55,12 @@ def make_eps_fns(materials):
 
             def eps_of_w(w_um, _mat=mat_ri):
                 lam = float(w_um)*1000
-                return _mat.get_epsilon(lam)
+                n = _mat.get_refractive_index(lam)
+                try:
+                    k = _mat.get_extinction_coefficient(lam)
+                except ri.refractiveindex.NoExtinctionCoefficient:
+                    k = 0.0  # assume lossless if dataset has no k
+                return (n + 1j*k)**2
             
             fns[key] = eps_of_w
     return fns

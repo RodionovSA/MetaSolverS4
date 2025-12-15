@@ -33,12 +33,24 @@ def _expand_shape(name: str, shp: Dict[str, Any]) -> List[Dict[str, Any]]:
     ang = _expand_spec(shp.get("rotation_deg", {"value": 0}))
 
     if stype == "rectangle":
-        hx = _expand_spec(shp["halfwidths"]["x"])
-        # support tie for y
+        hx_list = _expand_spec(shp["halfwidths"]["x"])
         hy_spec = shp["halfwidths"]["y"]
-        hy = cx if isinstance(hy_spec, dict) and hy_spec.get("tie") == "x" else _expand_spec(hy_spec)
-        combos = product(cx, cy, ang, hx, hy)
+        tie_y   = isinstance(hy_spec, dict) and hy_spec.get("tie") == "x"
+        
+        if tie_y:
+            # elementwise tie: hy = hx for each hx value
+            combos = (
+                (x0, y0, a0, hx_val, hx_val)
+                for x0 in cx
+                for y0 in cy
+                for a0 in ang
+                for hx_val in hx_list
+            )
+        else:
+            hy_list = _expand_spec(hy_spec)
+            combos = product(cx, cy, ang, hx_list, hy_list)
         key = "halfwidths"
+        
     elif stype == "ellipse":
         rx = _expand_spec(shp["radii"]["x"])
         ry_spec = shp["radii"]["y"]
