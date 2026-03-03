@@ -3,13 +3,13 @@
 schema: s4_1.1
 units: { length: um, angle: deg }
 
-filename: 'results/LWIR_Meta/rect_si_air_d1500_t8000_a4000_angle0-15' # Name of the file to save
+filename: 'results/Tests' # Name of the file to save
 
 lattice:
-  a: {value: 4}  # x period (µm)
+  a: {value: 0.4}  # x period (µm)
 layers:
   - { name: Top,    thickness: {value: 0.0},   material_key: Air }
-  - { name: Pillar, thickness: {value: 8.0}, material_key: Air }   # shapes go here (Air is on background)
+  - { name: Pillar, thickness: {value: 0.2}, material_key: Air }   # shapes go here (Air is on background)
   - { name: Bottom, thickness: {value: 0.0},   material_key: Sub }
 
 materials:
@@ -25,12 +25,12 @@ materials:
     #   Everything else is ignored. Support only real constant n.
   # Map keys (Air/Meta/Sub) to refractiveindex.info datasets or RIDB
   Air:  { shelf: main, name: Air,   source: n=1 }           # constant
-  Meta: { shelf: main, name: Si, source: n=3.42 }          # metasurface 
-  Sub:  { shelf: main, name: Si,  source: n=3.42 }          # substrate 
+  Meta: { shelf: RIDB, name: Si, source: aSi_LPCVD_200nm_110824 }          # metasurface 
+  Sub:  { shelf: main, name: Glass,  source: n=1.46 }          # substrate 
 
 sweep:
-  wl:    { lin: [3, 16, 261] }       # start, stop, num (µm)
-  theta: { lin: [0, 15, 16] }          # incidence polar angle (deg)
+  wl:    { lin: [0.45, 0.73, 29] }       # start, stop, num (µm)
+  theta: { value: 0 }          # incidence polar angle (deg)
   phi:   { value: 0 }                # azimuth (rad)
 
 shapes:
