@@ -12,10 +12,10 @@
 
 ## How it works (MPI)
 
-S4’s Python bindings aren’t MPI-aware, so the code parallelizes the outer simulation loops:
-- Rank 0 prints status and writes results.
-- All ranks build the same geometry variant, then each rank processes a round-robin subset of wavelengths.
-- Results are reduced (Allreduce) and saved as <filename>_<variant>.npz.
+S4’s Python bindings aren’t MPI-aware, so parallelism is implemented in Python using a two-level scheme:
+- Rank groups (variant parallelism): MPI ranks are split into fixed-size groups. Each group is assigned a subset of geometry variants by index (vidx % n_groups == group_id). Different groups can simulate different variants concurrently.
+- Within a group (wavelength parallelism): For a given variant, every rank in the group builds the same S4 geometry, then computes only its round-robin subset of wavelengths (my_widx). Each rank fills its wavelength slice of T/R (and phases), leaving the rest as zeros.
+- Reduction + output: The group merges per-rank wavelength slices with gcomm.Allreduce(..., op=SUM) to assemble full spectra. A single group leader (grank == 0) writes <filename>_<vidx>.npz to avoid file collisions.
 
 ## Config
 
